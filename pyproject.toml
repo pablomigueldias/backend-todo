@@ -46,6 +46,7 @@ format = "ruff format"
 pre_format = "ruff check --fix"
 pre_test = "task lint"
 run = 'fastapi dev backend_todo/app.py'
+run_local = 'fastapi dev backend_todo/app.py --host 0.0.0.0'
 test = "pytest -s -x --cov=backend_todo -vv"
 post_test = "coverage html"
 
