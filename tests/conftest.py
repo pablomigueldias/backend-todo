@@ -10,6 +10,7 @@ from sqlalchemy.pool import StaticPool
 from backend_todo.app import app
 from backend_todo.database import get_session
 from backend_todo.models import User, table_registry
+from backend_todo.security import get_password_hash
 
 
 @pytest.fixture
@@ -61,9 +62,28 @@ def mock_db_time():
 
 @pytest.fixture
 def user(session: Session):
-    user = User(username='Pablo', email='pablo@pablo.com', password='segredo')
+    password = 'testpass'
+    user = User(
+        username='Pablo',
+        email='pablo@pablo.com',
+        password=get_password_hash(password),
+    )
     session.add(user)
     session.commit()
     session.refresh(user)
 
+    user.clean_password = password  # type: ignore
+
     return user
+
+
+@pytest.fixture
+def token(client: TestClient, user):
+    response = client.post(
+        '/token',
+        data={
+            'username': user.username,
+            'password': user.clean_password,
+        },
+    )
+    return response.json()['access_token']
