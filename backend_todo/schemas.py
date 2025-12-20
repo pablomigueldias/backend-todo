@@ -20,3 +20,8 @@ class UsersPublic(BaseModel):
 
 class Userlist(BaseModel):
     users: list[UsersPublic]
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
