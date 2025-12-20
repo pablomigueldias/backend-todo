@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from backend_todo.settings import Settings
 
-engine = create_engine(Settings().DATABASE_URL) #type: ignore
+engine = create_engine(Settings().DATABASE_URL)  # type: ignore
 
 session = Session(engine)
 
