@@ -12,14 +12,12 @@ from sqlalchemy.orm import Session
 
 from backend_todo.database import get_session
 from backend_todo.models import User
+from backend_todo.settings import Settings
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='auth/token')
+settings = Settings()  # type: ignore
 
 pwd_context = PasswordHash.recommended()
-
-SECRET_KEY = 'your-secret-key'
-ALGORITHM = 'HS256'
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
 def get_password_hash(password: str):
@@ -34,11 +32,13 @@ def create_access_token(data: dict):
     to_encode = data.copy()
 
     expire = datetime.now(tz=ZoneInfo('UTC')) + timedelta(
-        minutes=ACCESS_TOKEN_EXPIRE_MINUTES
+        minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
     )
     to_encode.update({'exp': expire})
 
-    token_gerado = encode_jwt(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    token_gerado = encode_jwt(
+        to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
+    )
 
     return token_gerado
 
@@ -54,7 +54,9 @@ def get_current_user(
     )
 
     try:
-        payload = decode(token, SECRET_KEY, algorithms=ALGORITHM)
+        payload = decode(
+            token, settings.SECRET_KEY, algorithms=settings.ALGORITHM
+        )
         subject: str = payload.get('sub')
         if not subject:
             raise credentials_exception
